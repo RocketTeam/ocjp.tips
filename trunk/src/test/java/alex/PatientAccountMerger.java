@@ -1,24 +1,24 @@
 package alex;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * mnikitin on 5/22/15.
  *
  * This demo class merges two different lists of patient accounts according to their insurance type.
+ *
  */
 public class PatientAccountMerger {
 
 	/**
 	 * OMS insurance type
 	 * */
-	private static final int INSURANCE_TYPE_OMS = 0;
+	public static final int INSURANCE_TYPE_OMS = 0;
 
 	/**
 	 * DMS insurance type
 	 * */
-	private static final int INSURANCE_TYPE_DMS = 1;
+	public static final int INSURANCE_TYPE_DMS = 1;
 
 	public static void main(String[] args) {
 		List<PatientAccount> omsAccounts = new ArrayList<>();
@@ -33,9 +33,10 @@ public class PatientAccountMerger {
 		dmsAccounts.add(new PatientAccount(2, "Squidward", INSURANCE_TYPE_DMS));
 		dmsAccounts.add(new PatientAccount(6, "Mr. Anybody", INSURANCE_TYPE_DMS));
 
-		List<PatientAccount> mergedAccounts = mergePatientAccounts(omsAccounts, dmsAccounts);
-		for (int i = 0; i < mergedAccounts.size(); i++) {
-			PatientAccount account = mergedAccounts.get(i);
+		PatientAccountMerger accountMerger = new PatientAccountMerger();
+		List<PatientAccount> mergedAccounts = accountMerger.mergePatientAccounts(omsAccounts, dmsAccounts);
+
+		for (PatientAccount account : mergedAccounts) {
 			System.out.println("[ ID: " + account.getPassportId() + " | Name: " + account.getName() + " | Type: " + account.getInsuranceType() + " ]");
 		}
 	}
@@ -43,8 +44,44 @@ public class PatientAccountMerger {
 	/**
 	 * This method merges oms-specific accounts with dms-specific accounts with respect to the rule:
 	 * if patient has both DMS and OMS accounts - DMS account should be added to result
-	 * */
-	public static List<PatientAccount> mergePatientAccounts(List<PatientAccount> omsAccounts, List<PatientAccount> dmsAccounts) {
-		return null;
+	 */
+	public List<PatientAccount> mergePatientAccounts(List<PatientAccount> omsAccounts, List<PatientAccount> dmsAccounts) {
+		if (omsAccounts == null) {
+			throw new RuntimeException("Failed to merge accounts. OMS accounts are missing.");
+		}
+
+		if (dmsAccounts == null) {
+			throw new RuntimeException("Failed to merge accounts. DMS accounts are missing.");
+		}
+
+		Set<Integer> passportIds = new HashSet<>();
+
+		List<PatientAccount> mergedAccounts = new ArrayList<>();
+		for (PatientAccount patientAccount : dmsAccounts) {
+			passportIds.add(patientAccount.getPassportId());
+			mergedAccounts.add(patientAccount);
+		}
+
+		for (PatientAccount currentAccount : omsAccounts) {
+			if (passportIds.contains(currentAccount.getPassportId())) {
+				continue;
+			}
+
+			mergedAccounts.add(currentAccount);
+		}
+
+		removeAllWhoIsMr(mergedAccounts);
+
+		return mergedAccounts;
+	}
+
+	private static void removeAllWhoIsMr(List<PatientAccount> mergedAccounts) {
+		Iterator<PatientAccount> iterator = mergedAccounts.iterator();
+		while (iterator.hasNext()) {
+			PatientAccount nextAccount = iterator.next();
+			if (nextAccount.getName().startsWith("Mr.")) {
+				iterator.remove();
+			}
+		}
 	}
 }

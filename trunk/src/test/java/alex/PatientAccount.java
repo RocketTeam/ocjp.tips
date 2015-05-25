@@ -5,7 +5,7 @@ package alex;
  * <p>
  * This class represents information about patient account
  */
-public class PatientAccount {
+public class PatientAccount implements Breathable {
 
 	/**
 	 * Unique patient ID
@@ -18,7 +18,7 @@ public class PatientAccount {
 	/**
 	 * Type of insurance current patient has
 	 */
-	private int insuranceType;
+	private int insuranceType = PatientAccountMerger.INSURANCE_TYPE_OMS;
 
 	public PatientAccount(int passportId, String name, int insuranceType) {
 		this.passportId = passportId;
@@ -48,5 +48,9 @@ public class PatientAccount {
 
 	public void setInsuranceType(int insuranceType) {
 		this.insuranceType = insuranceType;
+	}
+
+	public void breathe() {
+		System.out.println("Uff uff uff");
 	}
 }
